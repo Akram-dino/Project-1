@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Automated Crop Irrigation System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #eaf4eb;
+    }
+    .card {
+      height: 100%;
+    }
+    .real-time-card {
+      height: 50%;
+    }
+    .bg-info { background-color: #4caf50; }
+    .bg-success { background-color: #81c784; }
+    .bg-warning { background-color: #fbc02d; }
+    .bg-danger { background-color: #e57373; }
+    .text-white { color: #ffffff; }
+    .alert-warning {
+      color: #856404;
+      background-color: #fff3cd;
+      border-color: #ffeeba;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #3e4e34;">
+    <div class="container-fluid justify-content-center">
+      <a class="navbar-brand" href="#">Automated Crop Irrigation System</a>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    <a href="index.html" class="btn btn-secondary mb-4">Back</a>
+    <div class="row">
+      <!-- Real-time Data Section -->
+      <div class="col-lg-4 mb-4">
+        <div class="card text-center real-time-card">
+          <div class="card-header bg-info text-white">Real-Time Soil Moisture</div>
+          <div class="card-body d-flex flex-column align-items-center justify-content-center">
+            <h5 class="card-title">Moisture Level: <span id="moisture-level">45%</span></h5>
+            <p class="card-text">Status: <span id="status">Normal</span></p>
+            <button class="btn btn-primary btn-refresh" onclick="refreshData()">Refresh Data</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Data Section -->
+      <div class="col-lg-8 mb-4">
+        <div class="card text-center">
+          <div class="card-header bg-secondary text-white">Recent Moisture Data</div>
+          <div class="card-body">
+            <ul id="recent-data-list" class="list-group">
+              <!-- Recent data will be appended here -->
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Threshold Setting Section -->
+      <div class="col-12 mb-4">
+        <div class="card text-center">
+          <div class="card-header bg-warning text-white">Set Moisture Threshold</div>
+          <div class="card-body">
+            <input type="number" id="threshold-input" class="form-control mb-3" placeholder="Enter threshold level (e.g., 30%)">
+            <button class="btn btn-warning" onclick="setThreshold()">Set Threshold</button>
+            <div id="alert-message" class="alert alert-warning mt-3" role="alert">
+              Warning: Moisture level is below the threshold! Action required.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let threshold = 30;  // Default threshold level in percentage
+    const recentData = [
+      { timestamp: '10:00 AM', moisture_level: '45%', status: 'Normal' },
+      { timestamp: '9:45 AM', moisture_level: '55%', status: 'High' },
+      { timestamp: '9:30 AM', moisture_level: '35%', status: 'Low' },
+      { timestamp: '9:15 AM', moisture_level: '20%', status: 'Very Low' }
+    ];
+
+    function displayRecentData() {
+      const recentDataList = document.getElementById("recent-data-list");
+      recentDataList.innerHTML = ''; // Clear existing data
+
+      recentData.forEach(entry => {
+        const listItem = document.createElement("li");
+        listItem.classList.add("list-group-item", "text-start");
+        listItem.innerHTML = `<strong>${entry.timestamp}:</strong> Moisture Level - ${entry.moisture_level}, Status - ${entry.status}`;
+        recentDataList.appendChild(listItem);
+      });
+    }
+
+    function setThreshold() {
+      const input = document.getElementById("threshold-input").value;
+      threshold = parseInt(input, 10);
+      alert(`Threshold set to ${threshold}%`);
+    }
+
+    function refreshData() {
+      // Simulate new random data
+      const dummyData = [
+        { moisture_level: '30%', status: 'Low' },
+        { moisture_level: '45%', status: 'Normal' },
+        { moisture_level: '60%', status: 'High' },
+        { moisture_level: '20%', status: 'Very Low' }
+      ];
+      const newReading = dummyData[Math.floor(Math.random() * dummyData.length)];
+      const timestamp = new Date().toLocaleTimeString();
+
+      document.getElementById("moisture-level").innerText = newReading.moisture_level;
+      document.getElementById("status").innerText = newReading.status;
+
+      // Add the new reading to recentData and limit to last 5 entries
+      recentData.unshift({ timestamp: timestamp, moisture_level: newReading.moisture_level, status: newReading.status });
+      if (recentData.length > 5) recentData.pop();
+
+      displayRecentData();
+      
+      // Check if the moisture level is below the threshold and trigger alert
+      const moistureValue = parseInt(newReading.moisture_level, 10);
+      if (moistureValue < threshold) {
+        document.getElementById("alert-message").style.display = 'block';
+      } else {
+        document.getElementById("alert-message").style.display = 'none';
+      }
+    }
+
+    // Display initial recent data on page load
+    displayRecentData();
+  </script>
+</body>
+</html>
